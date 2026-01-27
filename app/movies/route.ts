@@ -3,10 +3,11 @@
 // }
 
 import { movies } from "./db";
+import type { NextRequest } from "next/server.js";
 
-export async function GET() {
-  return Response.json(movies);
-}
+// export async function GET() {
+//   return Response.json(movies);
+// }
 
 export async function POST(res: Request) {
   const movie = await res.json();
@@ -21,4 +22,15 @@ export async function POST(res: Request) {
   // our posted movie object or objects is pushed into the movies array.
 
   return new Response(JSON.stringify(newMovie));
+}
+
+export async function GET(req: NextRequest) {
+  const searchParams = req.nextUrl.searchParams;
+  const query = searchParams.get("query");
+
+  const filteredMovies = query
+    ? movies.filter((m) => m.name.toLowerCase().includes(query))
+    : movies;
+
+  return new Response(JSON.stringify(filteredMovies));
 }
