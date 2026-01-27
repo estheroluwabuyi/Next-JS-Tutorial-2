@@ -13,12 +13,47 @@ export async function GET(
     : new Response("Movie not found", { status: 404 });
 }
 
-// export async function POST(res: Request) {
-//   const movie = await res.json();
+export async function PATCH(
+  req: Request,
+  { params }: { params: { id: string } },
+) {
+  const { id } = params;
+  const movieId = +id;
 
-//   const newMovie = { ...movie };
+  // Check if movie exists
+  const movie = movies.find((m) => m.id === movieId);
 
-//   movies.push(newMovie);
+  if (!movie) {
+    return new Response(JSON.stringify({ error: "Movie not found" }), {
+      status: 404,
+    });
+  }
 
-//   return new Response(JSON.stringify(newMovie));
-// }
+  try {
+    const updatedMovie = await req.json();
+
+    // Find the index of the movie
+    const index = movies.findIndex((m) => m.id === movieId);
+
+    if (!movie) {
+      return new Response(JSON.stringify({ error: "Movie not found" }), {
+        status: 404,
+      });
+    }
+
+    //   if (index === -1) {
+    //   return new Response(JSON.stringify({ error: "Movie not found" }), {
+    //     status: 404,
+    //   });
+    // }
+
+    // Update the movie
+    movies[index] = { ...movie, ...updatedMovie };
+
+    return new Response(JSON.stringify(movies[index]), { status: 200 });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: "Failed to parse JSON" }), {
+      status: 400,
+    });
+  }
+}
